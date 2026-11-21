@@ -30,3 +30,13 @@ chroma_db/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Archives
+*.zip
+
+# Logs
+*.log
+
+# Secrets
+*.pem
+*.key
