@@ -14,10 +14,12 @@ MODEL_NAME = "llama3.2:1b"
 
 def generate_response(prompt, system_prompt=None, num_predict=320):
     """Generate a response from the locally running Ollama model."""
+
     if not isinstance(prompt, str) or not prompt.strip():
         return "Please enter a question."
 
     messages = []
+
     if system_prompt:
         messages.append({
             "role": "system",
@@ -39,20 +41,24 @@ def generate_response(prompt, system_prompt=None, num_predict=320):
                 "num_ctx": 4096
             }
         )
+
         answer = response.get("message", {}).get("content", "").strip()
+
         return answer or (
             "I couldn't form an answer. Please try rephrasing your question."
         )
-    except Exception as error:
+
+    except Exception:
         return (
             "I couldn't connect to the local language model. "
-            "Check that Ollama is running and that the model "
-            f"'{MODEL_NAME}' is available. Details: {error}"
+            "Please check that Ollama is running and that the "
+            "required model is available. Try again later."
         )
 
 
 def generate_dataset_summary(dataset_information):
     """Generate a dataset-specific explanation from Python-calculated facts."""
+
     system_prompt = """
 You are ADA, an assistant inside an AI Data Analyst application.
 
@@ -74,6 +80,7 @@ Rules:
 - Use clear headings and beginner-friendly language.
 - Prioritize the most useful findings; avoid generic filler.
 """
+
     prompt = f"""
 Explain the most important findings in this dataset.
 
@@ -90,11 +97,13 @@ PYTHON-CALCULATED DATASET EVIDENCE:
 
 Write a clear explanation grounded only in this evidence.
 """
+
     return generate_response(prompt, system_prompt, num_predict=380)
 
 
 def ask_dataset_question(dataset_information, question):
     """Answer a question using the supplied dataset profile as evidence."""
+
     if not isinstance(question, str) or not question.strip():
         return "Please enter a question."
 
@@ -116,6 +125,7 @@ Rules:
 - Avoid generic disclaimers and unnecessary follow-up questions.
 - If the question is ambiguous, state the interpretation you are using.
 """
+
     prompt = f"""
 PYTHON-CALCULATED DATASET EVIDENCE:
 <dataset_evidence>
@@ -129,4 +139,5 @@ USER QUESTION:
 
 Answer the question directly. Do not go beyond the evidence.
 """
+
     return generate_response(prompt, system_prompt, num_predict=420)
